@@ -57,7 +57,17 @@ func GenerateRandomStringFromRegex(regex string) (string, error) {
 
 		case '|':
 			// handle alternation
-			return "", regexp.ErrInternalError
+			options := strings.Split(expr[1:], "|")
+			subR, err := regexp.Compile(options[rand.Intn(len(options))])
+			if err != nil {
+				return "", err
+			}
+			subStr, err := GenerateRandomStringFromRegex(subR)
+			if err != nil {
+				return "", err
+			}
+			result = append(result, []byte(subStr)...)
+			expr = ""
 
 		default:
 			// handle normal characters
